@@ -1,3 +1,4 @@
 #include "node.h"
 
-void drawList(Node*h);
+void drawNode(Node* current, int index, int numElements);
+void drawList(Node* head, int numElements);

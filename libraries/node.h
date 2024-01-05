@@ -6,7 +6,7 @@
 typedef struct Node {
     int data;
     struct Node* next;
-    struct Node* prv;
+    struct Node* prev;
 } Node;
 
 void Create_Node(Node** h, int d);

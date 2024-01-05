@@ -1,5 +1,8 @@
 #include "raylib.h"
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define NODE_WIDTH 50
-#define NODE_HEIGHT 30
+#define RECT_WIDTH 80
+#define RECT_HEIGHT_FACTOR 2
+#define NEXT_RECT_WIDTH 20
+#define DATA_RECT_WIDTH (RECT_WIDTH - NEXT_RECT_WIDTH)
+#define POINTER_RECT_HEIGHT 30

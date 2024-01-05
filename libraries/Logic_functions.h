@@ -1,5 +1,5 @@
 
 #include "node.h"
-void Create_Node(int d);
-//implimentation is gonna be in .c files
+void Create_Node(Node** h,int d);
+void swapNodes(int* v1, int* v2);
 void Insertion_sort(Node** h);
