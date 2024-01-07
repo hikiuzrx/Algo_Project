@@ -155,3 +155,48 @@ void insertionSort(Node *originalHead, Node ***steps, int *stepCount)
         free(temp);
     }
 }
+// Frees memory occupied by the steps used in visualization
+void freeSteps(Node **steps, int stepCount)
+{
+    for (int i = 0; i < stepCount; i++)
+    {
+        Node *current = steps[i];
+        Node *temp;
+        while (current != NULL)
+        {
+            temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+    free(steps);
+}
+// Deletes a node with a specific value from the linked list
+void deleteNodeWithValue(Node **head, int value)
+{
+    Node *current = *head;
+
+    while (current != NULL && current->data != value)
+    {
+        current = current->next;
+    }
+
+    if (current != NULL)
+    {
+        if (current->prev != NULL)
+        {
+            current->prev->next = current->next;
+        }
+        else
+        {
+            *head = current->next;
+        }
+
+        if (current->next != NULL)
+        {
+            current->next->prev = current->prev;
+        }
+
+        free(current);
+    }
+}
