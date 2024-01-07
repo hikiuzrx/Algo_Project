@@ -34,7 +34,86 @@ int main(void)
     bool sortingCompleted = false; // Indicates whether the sorting process has been completed
     bool resetNeeded = false;      // Signals the need for a list reset (deletion) due to user action
     bool sortPressed = false;      // Indicates whether the "Sort" button has been pressed
+                                   
+    // Main application loop
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        DrawText("Press SPACEBAR to clear the window", 300, 100, 20, DARKGRAY);
+        // Drawing and handling UI menu
+        drawMenu(&userMenu);
+        handleButtonClicks(&userMenu, &head, &steps, &stepCount, &sortPressed);
 
+        // Sorting process visualization
+        if (sortPressed && !sortingCompleted)
+        {
+            static int frameCounter = 0;
+            const int maxFrameDelay = 60; // Adjust the value based on the delay you want
+
+            if (currentStep < stepCount)
+            {
+                displayList(steps[currentStep], 100, 150);
+
+                if (frameCounter >= maxFrameDelay)
+                {
+                    currentStep++;
+                    frameCounter = 0;
+                }
+                else
+                {
+                    frameCounter++;
+                }
+            }
+            else
+            {
+                sortingCompleted = true;
+                currentStep = 0;
+            }
+            DrawText("Sorting in progress... Press SPACE to cancel", 250, 50, 20, RED);
+        }
+        else
+        {
+            if (sortingCompleted)
+            {
+                // Display the sorted list after sorting is completed
+                displayList(steps[stepCount - 1], 100, 150);
+            }
+            else
+            {
+                // Display the current state of the list
+                displayList(head, 100, 150);
+            }
+        }
+        EndDrawing();
+
+        // Resetting the application if space bar is pressed
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            sortPressed = false;
+            sortingCompleted = false;
+            currentStep = 0;
+            resetNeeded = true;
+        }
+
+        // Resetting the list and handling window resize or escape key
+        if (resetNeeded)
+        {
+            resetNeeded = false;
+            // Resetting the list
+            while (head != NULL)
+            {
+                Node *temp = head;
+                head = head->next;
+                free(temp);
+            }
+            // Additional steps for resetting sorting-related variables or any other necessary tasks
+        }
+        if (IsWindowResized() || IsKeyPressed(KEY_ESCAPE))
+        {
+            break;
+        }
+    }
     return 0;
 }
                                      
