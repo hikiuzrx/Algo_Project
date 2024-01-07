@@ -114,6 +114,18 @@ int main(void)
             break;
         }
     }
+    // Free memory allocated for sorting steps
+    freeSteps(steps, stepCount);
+
+    // Free allocated memory for the linked list
+    while (head != NULL)
+    {
+        Node *temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    CloseWindow();
     return 0;
 }
                                      
