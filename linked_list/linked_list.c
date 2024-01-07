@@ -72,3 +72,86 @@ Node *insertAtPosition(Node *head, int data, int position)
 
     return head;
 }
+// Creates a copy of a linked list
+Node *copyList(Node *head)
+{
+    Node *newHead = NULL;
+    Node *tail = NULL;
+
+    while (head != NULL)
+    {
+        Node *newNode = (Node *)malloc(sizeof(Node));
+        newNode->data = head->data;
+        newNode->next = NULL;
+        newNode->prev = tail;
+
+        if (newHead == NULL)
+        {
+            newHead = newNode;
+        }
+        else
+        {
+            tail->next = newNode;
+        }
+
+        tail = newNode;
+        head = head->next;
+    }
+
+    return newHead;
+}
+// Performs insertion sort on the linked list, generating steps for visualization
+void insertionSort(Node *originalHead, Node ***steps, int *stepCount)
+{
+    Node *sorted = NULL;
+    Node *current = originalHead;
+
+    *stepCount = 0;
+
+    // Create an initial copy of the list to avoid modifying the original list
+    Node *duplicate = copyList(originalHead);
+
+    while (current != NULL)
+    {
+        Node *next = current->next;
+        if (sorted == NULL || sorted->data >= current->data)
+        {
+            current->next = sorted;
+            current->prev = NULL; // Update 'prev' pointer for the first node
+            if (sorted != NULL)
+            {
+                sorted->prev = current; // Update 'prev' pointer for sorted list
+            }
+            sorted = current;
+        }
+        else
+        {
+            Node *temp = sorted;
+            while (temp->next != NULL && temp->next->data < current->data)
+            {
+                temp = temp->next;
+            }
+            current->next = temp->next;
+            current->prev = temp;
+            if (temp->next != NULL)
+            {
+                temp->next->prev = current;
+            }
+            temp->next = current;
+        }
+
+        // Store a copy of the current sorted list
+        (*steps)[*stepCount] = copyList(sorted);
+        (*stepCount)++;
+
+        current = next;
+    }
+
+    // Free the duplicated list to avoid memory leaks
+    while (duplicate != NULL)
+    {
+        Node *temp = duplicate;
+        duplicate = duplicate->next;
+        free(temp);
+    }
+}
