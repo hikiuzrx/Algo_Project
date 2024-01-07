@@ -104,3 +104,126 @@ void drawButtons(Button buttons[], int buttonCount)
                  buttons[i].textColor);
     }
 }
+// Handles button clicks within the menu
+void handleButtonClicks(Menu *menu, Node **head, Node ***steps, int *stepCount, bool *sortPressed)
+{
+    if (!menu->visible)
+        return;
+
+    Vector2 mousePosition = GetMousePosition();
+
+    for (int i = 0; i < menu->buttonCount; ++i)
+    {
+        Button *btn = &menu->buttons[i];
+
+        if (CheckCollisionPointRec(mousePosition, btn->rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            switch (i)
+            {
+            case 0:
+            {
+                int value = getInputFromUser("Ajouter au début");
+                *head = insertAtBeginning(*head, value);
+                break;
+            }
+            case 1:
+            {
+                int value = getInputFromUser("Ajoute a la fin");
+                *head = insertAtEnd(*head, value);
+                break;
+            }
+            case 2:
+            {
+                int value = getInputFromUser("Entrer la valeur");
+                int position = getInputFromUser("Entrez la position de la valeur");
+                *head = insertAtPosition(*head, value, position);
+                break;
+            }
+            case 3:
+            {
+                int value = getInputFromUser("Entrez élément que vous voulez supprimer");
+                deleteNodeWithValue(head, value);
+                break;
+            }
+            case 4:
+            {
+                *sortPressed = !(*sortPressed);
+                if (*sortPressed)
+                {
+                    int count = 0;
+                    Node *temp = *head;
+                    while (temp != NULL)
+                    {
+                        count++;
+                        temp = temp->next;
+                    }
+                    *steps = (Node **)malloc(count * sizeof(Node *));
+                    insertionSort(*head, steps, stepCount);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    }
+}
+
+// Gets user input from a graphical input box
+int getInputFromUser(const char message[50])
+{
+    bool mouseOnText = false;
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    // Calculate the centered position for the slightly larger node-like box
+    Rectangle nodeBox = {screenWidth / 2 - BASE_NODE_WIDTH / 2, screenHeight / 2 - 40, BASE_NODE_WIDTH, 80}; // Adjusted Y position
+
+    int userInput = 0;
+    char inputText[MAX_INPUT_LENGTH + 1] = "\0";
+    int letterCount = 0;
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose())
+    {
+        if (IsKeyPressed(KEY_ENTER) && letterCount > 0)
+        {
+            userInput = atoi(inputText);
+            break;
+        }
+
+        int key = GetKeyPressed();
+
+        if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_LENGTH))
+        {
+            inputText[letterCount++] = (char)key;
+        }
+        else if ((key == KEY_BACKSPACE) && (letterCount > 0))
+        {
+            inputText[--letterCount] = '\0';
+        }
+
+        // Adjust node width dynamically based on the input text length
+        nodeBox.width = BASE_NODE_WIDTH + MeasureText(inputText, 40); // Base width + length of the text
+
+        mouseOnText = CheckCollisionPointRec(GetMousePosition(), nodeBox);
+        SetMouseCursor(mouseOnText ? MOUSE_CURSOR_IBEAM : MOUSE_CURSOR_DEFAULT);
+
+        BeginDrawing();
+        ClearBackground(DARKGRAY); // Change the window background color
+
+        // Draw slightly larger node-like box with a gradient fill (modified colors)
+        DrawRectangleGradientH(nodeBox.x, nodeBox.y, nodeBox.width, nodeBox.height, SKYBLUE, DARKBLUE); // Horizontal gradient from sky blue to dark blue
+
+        // Draw the input text with a contrasting color
+        DrawText(inputText, nodeBox.x + 10, nodeBox.y + 10, 40, Fade(RAYWHITE, 0.8f)); // White-colored text on the gradient box
+
+        // Draw a slightly larger label near the node box to instruct the user
+        DrawText("Enter a value:", nodeBox.x - MeasureText("Enter a value:", 40) - LABEL_OFFSET_X, nodeBox.y, 40, Fade(WHITE, 0.8f)); // White-colored label on the dark background
+
+        EndDrawing();
+    }
+
+    return userInput;
+}
