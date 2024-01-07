@@ -227,3 +227,95 @@ int getInputFromUser(const char message[50])
 
     return userInput;
 }
+// Displays the linked list on the screen
+void displayList(Node *head, int x, int y)
+{
+    int nodeWidth = 80;
+    int nodeHeight = 40;
+    int arrowLength = 30;
+    int squareSize = 30;
+
+    Node *current = head;
+    int nodeIndex = 0;
+    int listWidth = 0;
+
+    // Calculate total width of the list
+    while (current != NULL)
+    {
+        listWidth += nodeWidth + arrowLength;
+        current = current->next;
+    }
+
+    // Calculate starting X position to center the list
+    int screenWidth = GetScreenWidth();
+    int startX = (screenWidth - listWidth) / 2;
+
+    // Reset current pointer
+    current = head;
+
+    while (current != NULL)
+    {
+        // Draw node rectangle with gradient fill
+        Rectangle nodeRect = {startX + nodeIndex * (nodeWidth + arrowLength), y, nodeWidth, nodeHeight};
+        DrawRectangleGradientH(nodeRect.x, nodeRect.y, nodeRect.width, nodeRect.height, SKYBLUE, DARKBLUE);
+        DrawRectangleLines(nodeRect.x, nodeRect.y, nodeRect.width, nodeRect.height, BLACK);
+
+        // Draw square for node value
+        Rectangle square = {nodeRect.x + (nodeRect.width - squareSize) / 2,
+                            nodeRect.y + (nodeRect.height - squareSize) / 2,
+                            squareSize, squareSize};
+        DrawRectangleGradientH(square.x, square.y, square.width, square.height, ORANGE, GOLD);
+        DrawRectangleLines(square.x, square.y, square.width, square.height, BLACK);
+
+        // Draw node value inside the square
+        char str[20];
+        sprintf(str, "%d", current->data);
+        DrawText(str, square.x + 7, square.y + 5, 20, BLACK);
+
+        // Draw arrows and lines for doubly linked list
+        if (current->prev != NULL)
+        {
+            // Draw arrow pointing to previous node
+            DrawLine(nodeRect.x + nodeRect.width / 2, nodeRect.y + nodeRect.height / 2,
+                     nodeRect.x - arrowLength, nodeRect.y + nodeRect.height / 2, BLACK);
+            DrawTriangle((Vector2){nodeRect.x - arrowLength + 10, nodeRect.y + 10},
+                         (Vector2){nodeRect.x - arrowLength + 10, nodeRect.y + nodeRect.height - 10},
+                         (Vector2){nodeRect.x - arrowLength - 10, nodeRect.y + nodeRect.height / 2}, BLACK);
+
+            // Draw line connecting to the previous node
+            DrawLine(nodeRect.x, nodeRect.y + nodeRect.height / 2,
+                     nodeRect.x - arrowLength, nodeRect.y + nodeRect.height / 2, BLACK);
+        }
+
+        if (current->next != NULL)
+        {
+            // Draw arrow pointing to next node
+            DrawLine(nodeRect.x + nodeRect.width, nodeRect.y + nodeRect.height / 2,
+                     nodeRect.x + nodeRect.width + arrowLength, nodeRect.y + nodeRect.height / 2, BLACK);
+            DrawTriangle((Vector2){nodeRect.x + nodeRect.width + arrowLength - 10, nodeRect.y + 10},
+                         (Vector2){nodeRect.x + nodeRect.width + arrowLength - 10, nodeRect.y + nodeRect.height - 10},
+                         (Vector2){nodeRect.x + nodeRect.width + arrowLength + 10, nodeRect.y + nodeRect.height / 2}, BLACK);
+
+            // Draw line connecting to the next node
+            DrawLine(nodeRect.x + nodeRect.width, nodeRect.y + nodeRect.height / 2,
+                     nodeRect.x + nodeRect.width + arrowLength, nodeRect.y + nodeRect.height / 2, BLACK);
+        }
+
+        current = current->next;
+        nodeIndex++;
+    }
+}
+// Resets the linked list and associated sorting steps
+void resetList(Node **head, Node **steps, int stepCount)
+{
+    // Free allocated memory for the linked list
+    while (*head != NULL)
+    {
+        Node *temp = *head;
+        *head = (*head)->next;
+        free(temp);
+    }
+
+    // Free the steps for sorting
+    freeSteps(steps, stepCount);
+}
