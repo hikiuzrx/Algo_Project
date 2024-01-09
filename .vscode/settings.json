@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "definitions.h": "c",
-        "menu.h": "c",
-        "raylib.h": "c",
-        "linked_list.h": "c",
-        "colors.h": "c"
-    }
-}
